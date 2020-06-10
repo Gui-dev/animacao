@@ -6,6 +6,7 @@ import {
   Image,
   Alert,
   Dimensions,
+  PanResponder,
   TouchableWithoutFeedback,
 } from "react-native";
 
@@ -15,8 +16,42 @@ import styles from './style'
 
 const User = ( { user, onPress } ) => {
 
+  const { width } = Dimensions.get( 'window' )
+  const [ panResponser, setPanResponder ] = useState( {} )
   const [ offset, setOffset ] = useState( new Animated.ValueXY( { x: 0, y: 50 } ) )
   const [ opacity, setOpacity ] = useState( new Animated.Value( 0 ) )
+
+  useEffect( () => {
+    setPanResponder( PanResponder.create( {
+      
+      onPanResponderTerminationRequest: () => false,
+
+      onMoveShouldSetPanResponder: () => true,
+
+      onPanResponderMove: Animated.event( [ null, {
+        dx: offset.x,
+      } ] ),
+
+      onPanResponderRelease: () => {
+
+        if( offset.x._value < -200 ) {
+          Alert.alert( 'Deletar', 'Post deletado' )
+        }
+
+        Animated.spring( offset.x, {
+          toValue: 0,
+          bounciness: 30,
+        } ).start()
+      },
+
+      onPanResponderTerminate: () => {
+        Animated.spring( offset.x, {
+          toValue: 0,
+          bounciness: 10,
+        } ).start()
+      },
+    } ) )
+  }, [] )
 
   useEffect( () => {
 
@@ -39,10 +74,19 @@ const User = ( { user, onPress } ) => {
   }, [] )
 
   return (
-    <Animated.View style={ [
-      { transform: [ ...offset.getTranslateTransform() ] },
-      { opacity }
-    ] }>
+    <Animated.View 
+      { ...panResponser.panHandlers }
+      style={ [
+        { transform: [ 
+          ...offset.getTranslateTransform(),
+          { rotateZ: offset.x.interpolate( {
+            inputRange: [ width * -1, width ],
+            outputRange: [ '-50deg', '50deg' ],
+          } ) } 
+        ] },
+        { opacity }
+      ] }
+    >
       <TouchableWithoutFeedback onPress={ onPress }>
         <View style={styles.userContainer}>
           <Image style={styles.thumbnail} source={{ uri: user.thumbnail }} />
