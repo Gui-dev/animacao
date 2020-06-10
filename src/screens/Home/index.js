@@ -6,8 +6,8 @@ import {
   Text,
   Platform,
   StatusBar,
-  StyleSheet,
   Dimensions,
+  PanResponder,
   ScrollView,
   TouchableOpacity
 } from "react-native"
