@@ -2,14 +2,9 @@ import React, { useEffect, useState } from 'react'
 import {
   Animated,
   View,
-  Image,
-  Text,
-  Platform,
   StatusBar,
   Dimensions,
-  PanResponder,
   ScrollView,
-  TouchableOpacity
 } from "react-native"
 
 import User from './../../components/User'
